@@ -1,0 +1,27 @@
+import '../css/tailwind.css'
+import '../css/app.css'
+
+import { createInertiaApp } from '@inertiajs/vue3'
+import ui from '@nuxt/ui/vue-plugin'
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
+import { createSSRApp, h } from 'vue'
+import type { DefineComponent } from 'vue'
+import AppRoot from '@/components/AppRoot.vue'
+
+const appName = import.meta.env.VITE_APP_NAME || 'Laravel Nuxt UI Starter'
+
+createInertiaApp({
+    title: (title) => (title ? `${title} - ${appName}` : appName),
+    resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue')),
+    setup({ el, App, props, plugin }) {
+        createSSRApp({
+            render: () => h(AppRoot, {}, {
+                default: () => h(App, props)
+            })
+        })
+            .use(plugin)
+            .use(ui)
+            .mount(el)
+    },
+    progress: { color: 'var(--ui-primary)' }
+})

@@ -1,0 +1,68 @@
+import type { DropdownMenuItem, NavigationMenuItem } from '@nuxt/ui'
+import { router, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { route } from '@/utils/route'
+
+export function useAppLayout() {
+    const page = usePage()
+
+    const currentRoute = computed(() => page.props.currentRouteName)
+
+    const user = computed(() => page.props.auth.user)
+
+    const navMenuItems = computed<NavigationMenuItem[][]>(() => {
+        return [
+            [
+                {
+                    label: 'Home',
+                    icon: 'i-lucide-house',
+                    to: '/',
+                    active: currentRoute.value === 'index'
+                },
+                {
+                    label: 'Dashboard',
+                    icon: 'i-lucide-layout-dashboard',
+                    to: route('dashboard'),
+                    active: currentRoute.value === 'dashboard'
+                }
+            ],
+            [
+                {
+                    label: 'Laravel Docs',
+                    icon: 'i-lucide-book-open',
+                    to: 'https://laravel.com/docs/13.x',
+                    target: '_blank'
+                }
+            ]
+        ]
+    })
+
+    const userMenuItems = computed<DropdownMenuItem[][]>(() => {
+        const items: DropdownMenuItem[][] = [[
+            {
+                label: 'Settings',
+                icon: 'i-lucide-settings',
+                to: route('profile.edit')
+            }
+        ]]
+
+        items.push([
+            {
+                label: 'Log out',
+                icon: 'i-lucide-log-out',
+                onSelect: () => {
+                    router.post(route('logout'))
+                }
+            }
+        ])
+
+        return items
+    })
+
+    return {
+        currentRoute,
+        navMenuItems,
+        userMenuItems,
+        user
+    }
+}
